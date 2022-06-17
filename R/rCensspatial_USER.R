@@ -1,7 +1,6 @@
 
 rCensSp = function(beta, sigma2, phi, nugget, x, coords, cens="left", pcens=0.10, npred=0,
                    cov.model="exponential", kappa=NULL){
-
   beta = c(beta)
   if (!is.numeric(beta)) stop("beta must be a numeric vector")
   if (!all(is.finite(beta))) stop("beta must contain only finite values")

@@ -1,7 +1,6 @@
 
 MCEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, init.phi, init.nugget, type="exponential", kappa=NULL,
-                     lower=c(0.01,0.01), upper=c(30,30), MaxIter=500, nMin=20, nMax=5000,
-                     error=1e-5, show.SE=TRUE){
+                     lower=c(0.01,0.01), upper=c(30,30), MaxIter=500, nMin=20, nMax=5000, error=1e-5, show.SE=TRUE){
   n = length(c(y))
   if (!is.numeric(y)) stop("y must be a numeric vector")
   if (!is.numeric(x)) stop("x must be a numeric matrix")

@@ -6,12 +6,12 @@ This package was archived because of some problems with packages: CensSpatial, M
 * Problems with tlrmvnmvt and MomTrunc were solved.
 
 ## Test environments
-* local R installation, R 4.1.2
-* ubuntu 16.04 (on travis-ci), R 4.1.2
+* local R installation, R 4.2.0
+* ubuntu 16.04 (on travis-ci), R 4.2.0
 * win-builder (devel)
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors | 0 warnings | 0 note
 
 * This is a new release.
