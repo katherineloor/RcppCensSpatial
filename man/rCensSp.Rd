@@ -1,0 +1,66 @@
+\name{rCensSp}
+\alias{rCensSp}
+\title{Censored spatial data simulation}
+\usage{
+rCensSp(beta, sigma2, phi, nugget, x, coords, cens="left", pcens=0.1,
+  npred=0, cov.model="exponential", kappa=NULL)
+}
+\arguments{
+\item{beta}{linear regression parameters.}
+
+\item{sigma2}{partial sill parameter.}
+
+\item{phi}{spatial scaling parameter.}
+
+\item{nugget}{nugget effect parameter.}
+
+\item{x}{design matrix.}
+
+\item{coords}{2D spatial coordinates.}
+
+\item{cens}{\code{'left'} or \code{'right'} censoring. By default \code{='left'}.}
+
+\item{pcens}{desired censoring rate. By default \code{=0.10}.}
+
+\item{npred}{number of simulated data used for cross-validation (Prediction). By default \code{=0}.}
+
+\item{cov.model}{type of spatial correlation function: \code{'exponential'}, \code{'gaussian'},
+\code{'matern'}, and \code{'pow.exp'} for exponential, gaussian, matern, and power exponential, respectively.}
+
+\item{kappa}{parameter for all spatial correlation functions. For exponential and gaussian
+\code{kappa=NULL}, for power exponential \code{0 < kappa <= 2}, and for matern correlation function
+\code{kappa > 0}.}
+}
+\value{
+If \code{npred > 0}, it returns a list with two datasets: \code{Data} and \code{TestData};
+otherwise, it returns a list with the simulated data.
+
+\code{Data}
+\item{y}{response vector.}
+\item{ci}{censoring indicator.}
+\item{lcl}{lower censoring bound.}
+\item{ucl}{upper censoring bound.}
+\item{coords}{coordinates matrix.}
+\item{x}{design matrix.}
+
+\code{TestData}
+\item{y}{response vector.}
+\item{coords}{coordinates matrix.}
+\item{x}{design matrix.}
+}
+\description{
+This function simulates censored spatial data with a linear structure for an established censoring rate.
+}
+\examples{
+n = 100
+set.seed(1000)
+coords = round(matrix(runif(2*n,0,15),n,2), 5)
+x = cbind(1, rnorm(n))
+data = rCensSp(beta=c(5,2), sigma2=2, phi=4, nugget=0.70, x=x, coords=coords,
+               cens="left", pcens=0.10, npred=10, cov.model="gaussian")
+data$TrainingData
+data$TestData
+}
+\author{
+Katherine L. Valeriano, Alejandro Ordoñez, Christian E. Galarza, and Larissa A. Matos.
+}
