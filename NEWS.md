@@ -1,7 +1,7 @@
 
 ### News for package RcppCensSpatial
 
-<font color='grey'>**RcppCensSpatial 0.3.0_(2022-0-0)_**</font>
+<font color='grey'>**RcppCensSpatial 0.3.0_(2022-06-25)_**</font>
 
 * The package CensSpatial was removed from suggests.
 * TCDD concentration data was added.

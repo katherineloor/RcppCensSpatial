@@ -9,35 +9,7 @@ using namespace Rcpp;
 using namespace arma;
 using namespace roptim;
 
-// ALGORITHMS FOR GAUSSIAN SPATIAL MODEL
-
-arma::mat BesselK(arma::mat A, double ka){
-  Environment base("package:base");
-  Function besselk("besselK");
-  arma::mat BA = as<arma::mat>(besselk(A,ka));
-  //arma::uword p1 = A.n_rows;
-  //arma::mat BA(p1, p1, fill::zeros);
-  //for (uword i=0; i<p1; i++){
-  //  for (uword j=(i+1); j<p1; j++){
-  //    BA(i,j) = BA(j,i) = boost::math::cyl_bessel_k(ka,A(i,j));
-  //  }
-  //}
-  return BA;
-}
-
-arma::mat rtnormal(int n, arma::vec mu, arma::mat Sigma, arma::vec a, arma::vec b){
-  Environment pkg = Environment::namespace_env("relliptical");
-  Function rtelliptical2 = pkg["rtelliptical"];
-  arma::mat sample = as<arma::mat>(rtelliptical2(n, mu, Sigma, a, b));
-  return sample;
-}
-
-List Nmoment(arma::vec mu, arma::mat Sigma, arma::vec lower, arma::vec upper, int n, int burn, int thinning){
-  Environment pkg = Environment::namespace_env("relliptical");
-  Function mvtelliptical2 = pkg["mvtelliptical"];
-  List moments = mvtelliptical2(lower, upper, mu, Sigma, "Normal", NULL, n, burn, thinning);
-  return moments;
-}
+//R_NilValue == NULL
 
 // Functions to be minimized considering exponential, gaussian, matern, and power exponential spatial correlation
 // ------------------------------------------------------------------------------------------------------------
@@ -112,6 +84,19 @@ class optimPExp : public Functor {
   }
 };
 // MATERN
+arma::mat BesselK(arma::mat A, double ka){
+  Environment base("package:base");
+  Function besselk("besselK");
+  arma::mat BA = as<arma::mat>(besselk(A,ka));
+  //arma::uword p1 = A.n_rows;
+  //arma::mat BA(p1, p1, fill::zeros);
+  //for (uword i=0; i<p1; i++){
+  //  for (uword j=(i+1); j<p1; j++){
+  //    BA(i,j) = BA(j,i) = boost::math::cyl_bessel_k(ka,A(i,j));
+  //  }
+  //}
+  return BA;
+}
 class optimMat : public Functor {
   private:
     const arma::mat A; // Distance matrix
@@ -328,9 +313,16 @@ arma::mat Information(double sigma2, double phi, arma::mat X, arma::vec y, arma:
 
 // Information matrix for the EM - MCEM algorithm for censored data
 // ------------------------------------------------------------------------------------------------------------
+arma::mat rtnormal(int n, arma::vec mu, arma::mat Sigma, arma::vec a, arma::vec b, int burn, int lag){
+  Environment pkg = Environment::namespace_env("relliptical");
+  Function rtelliptical2 = pkg["rtelliptical"];
+  arma::mat sample = as<arma::mat>(rtelliptical2(n, mu, Sigma, a, b, "Normal", R_NilValue, R_NilValue, R_NilValue, R_NilValue, burn, lag));
+
+  return sample;
+}
+
 arma::mat InformationEM(arma::vec beta, double sigma2, double phi, double tau2, arma::mat X, arma::mat y, String typeS,
                         double kappa, arma::uvec ind0, arma::uvec ind1, arma::mat distM, arma::vec lower, arma::vec upper){
-
   arma::uword q = X.n_cols;
   int n = 10000;
   arma::mat R = CorrSpatial(distM, phi, kappa, typeS);
@@ -346,7 +338,7 @@ arma::mat InformationEM(arma::vec beta, double sigma2, double phi, double tau2, 
   arma::vec mu21 = media(ind1) + Sigma(ind1,ind0)*invS00*(y(ind0) - media(ind0));
   arma::mat Sigma21 = Sigma(ind1,ind1) - Sigma(ind1,ind0)*invS00*Sigma(ind0,ind1);
   Sigma21 = 0.50*(Sigma21 + Sigma21.t());
-  arma::mat samplesY = rtnormal(n, mu21, Sigma21, lower(ind1), upper(ind1));
+  arma::mat samplesY = rtnormal(n, mu21, Sigma21, lower(ind1), upper(ind1), 0, 1);
   arma::vec mean0 = (mean(samplesY,0)).t();
   arma::vec EY = y;
   arma::mat EYY = y*y.t();
@@ -406,8 +398,7 @@ arma::mat InformationEM(arma::vec beta, double sigma2, double phi, double tau2, 
 // [[Rcpp::export]]
 List Spatial_model(arma::vec y, arma::mat X, arma::mat coords, double init_phi, double init_tau, arma::vec lowerp,
                    arma::vec upperp, String type, double kappa, arma::uword Maxiter, double tol, bool infM){
-
-  Progress time(Maxiter,true);
+  Progress time(Maxiter, true);
   uword p = y.n_elem;
   uword q = X.n_cols;
   arma::uvec indexs = arma::regspace<arma::uvec>(0,1,q-1);
@@ -473,6 +464,8 @@ List Spatial_model(arma::vec y, arma::mat X, arma::mat coords, double init_phi, 
 List MCEMspatial(arma::vec y, arma::mat X, arma::vec cc, arma::vec lower, arma::vec upper, arma::mat coords,
                  double init_phi, double init_tau, arma::vec lowerp, arma::vec upperp, String type,
                  double kappa, arma::uword Maxiter, arma::uword nMin, arma::uword nMax, double tol, bool infM){
+  Environment pkg = Environment::namespace_env("relliptical");
+  Function Nmoment = pkg["mvtelliptical"];
 
   Progress time(Maxiter,true);
   uword p = y.size();
@@ -530,7 +523,7 @@ List MCEMspatial(arma::vec y, arma::mat X, arma::vec cc, arma::vec lower, arma::
     mu21 = media(ind1) + Sigma(ind1,ind0)*invSigma*(y(ind0) - media(ind0));
     Sigma21 = Sigma(ind1,ind1) - Sigma(ind1,ind0)*invSigma*Sigma(ind0,ind1);
     Sigma21 = 0.50*(Sigma21 + Sigma21.t());
-    moments = Nmoment(mu21, Sigma21, lower1, upper1, n1, 0, 1);
+    moments = Nmoment(lower1, upper1, mu21, Sigma21, "Normal", R_NilValue, n1, 0, 1);
     EY(ind1) = as<arma::vec>(moments["EY"]);
     EYY(ind1,ind1) = as<arma::mat>(moments["EYY"]);
     EYY(ind1,ind0) = as<arma::vec>(moments["EY"])*(y(ind0)).t();
@@ -581,7 +574,6 @@ List MCEMspatial(arma::vec y, arma::mat X, arma::vec cc, arma::vec lower, arma::
 List EMspatial(arma::vec y, arma::mat X, arma::vec cc, arma::vec lower, arma::vec upper, arma::mat coords,
                double init_phi, double init_tau, arma::vec lowerp, arma::vec upperp, String type,
                double kappa, arma::uword Maxiter, double tol, bool infM){
-
   Environment pkg = Environment::namespace_env("MomTrunc");
   Function mvTnorm = pkg["meanvarTMD"];
 
@@ -636,7 +628,7 @@ List EMspatial(arma::vec y, arma::mat X, arma::vec cc, arma::vec lower, arma::ve
     invSigma = (Sigma(ind0,ind0)).i();
     mu21 = media(ind1) + Sigma(ind1,ind0)*invSigma*(y(ind0) - media(ind0));
     Sigma21 = Sigma(ind1,ind1) - Sigma(ind1,ind0)*invSigma*Sigma(ind0,ind1);
-    moments = mvTnorm(lower1, upper1, mu21, Sigma21, NULL, NULL, NULL, NULL, "normal");
+    moments = mvTnorm(lower1, upper1, mu21, Sigma21, R_NilValue, R_NilValue, R_NilValue, R_NilValue, "normal");
     EY(ind1) = as<arma::vec>(moments["mean"]);
     EYY(ind1,ind1) = as<arma::mat>(moments["EYY"]);
     EYY(ind1,ind0) = as<arma::vec>(moments["mean"])*(y(ind0)).t();
@@ -679,8 +671,7 @@ List EMspatial(arma::vec y, arma::mat X, arma::vec cc, arma::vec lower, arma::ve
 List SAEMspatial(arma::vec y, arma::mat X, arma::vec cc, arma::vec lower, arma::vec upper, arma::mat coords,
                  double init_phi, double init_tau, arma::vec lowerp, arma::vec upperp, String type,
                  double kappa, arma::uword Maxiter, double pc, arma::uword m, double tol, bool infM){
-
-  Progress time(Maxiter,true);
+  Progress time(Maxiter, true);
   arma::uword p = y.size();
   arma::uword q = X.n_cols;
   arma::uvec indexs = arma::regspace<arma::uvec>(0,1,q-1);
@@ -730,7 +721,6 @@ List SAEMspatial(arma::vec y, arma::mat X, arma::vec cc, arma::vec lower, arma::
   arma::uword count = 0;
 
   // SAEM ALGORITHM ------------------------------------------------------------
-  arma::mat samGibbs(4, p1, fill::zeros);
   arma::mat gibbs(1, p1, fill::zeros);
   arma::vec SAEMY(p, fill::zeros);          // Estimate of first conditional moment
   arma::mat SAEMYY(p, p, fill::zeros);       // Estimate of second conditional moment
@@ -752,8 +742,7 @@ List SAEMspatial(arma::vec y, arma::mat X, arma::vec cc, arma::vec lower, arma::
     Sigma21 = Sigma(ind1,ind1) - Sigma(ind1,ind0)*invSigma*Sigma(ind0,ind1);
     Sigma21 = 0.50*(Sigma21 + Sigma21.t());
     for (uword i=0; i<m; i++){
-      samGibbs = rtnormal(4, mu21, Sigma21, lower1, upper1);
-      gibbs = samGibbs.row(3);
+      gibbs = rtnormal(1, mu21, Sigma21, lower1, upper1, 3, 1);
       auxY(ind1) = (gibbs).t();
       EY = EY + auxY;
       EYY = EYY + auxY*auxY.t();

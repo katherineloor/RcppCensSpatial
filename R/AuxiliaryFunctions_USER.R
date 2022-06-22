@@ -62,7 +62,7 @@ predict.sclm = function(object, locPre, xPre, ...){
     if (nrow(locPre)!=nrow(xPre) | ncol(locPre)!=2) stop("Non-conformable dimensions between locPre and xPre")
   } else { stop("locPre and xPre must be specified") }
 
-  ypred = predict.new(object,xPre,locPre)
+  ypred = predict.new(object, xPre, locPre)
   out.ST = ypred
 
   return(out.ST)
@@ -77,38 +77,15 @@ summary.sclm = function(object, ...){
   cat("Call:\n")
   print(object$call)
   cat('\nEstimated parameters:\n')
-  # Estimates
-  if (all(object$X[,1]==1)) {
-    namesx = paste0('\u03b2',0)
-    if (ncol(object$X) > 1){ for (i in 2:ncol(object$X)){ namesx = cbind(namesx, paste0('\u03b2',i-1)) } }
-  } else {
-    namesx = paste0('\u03b2',1)
-    if (ncol(object$X) > 1){ for (i in 2:ncol(object$X)){ namesx = cbind(namesx, paste0('\u03b2',i)) } }
-  }
-  greeks = c(sigma='\u03c3\u00B2', phi='\u03D5', tau='\u03C4\u00B2')
-  lab = c(namesx,greeks)
-
-  if (object$show.SE) {
-    tab = round(rbind(c(object$theta),c(object$SE)),4)
-    colnames(tab) = lab
-    rownames(tab) = c("","s.e.")
-  } else {
-    tab = round(rbind(c(object$theta)),4)
-    colnames(tab) = lab
-    rownames(tab) = c("")
-  }
-  print(tab)
+  print(object$tab)
   cat('\n')
-  cat(paste('The effective range is',round(object$range,4),'spatial units.\n'))
+  cat(paste('The effective range is',round(object$range,4),'units.\n'))
   cat('\nModel selection criteria:\n')
-  critFin <- c(object$loglik, object$AIC, object$BIC)
-  critFin <- round(t(as.matrix(critFin)),2)
-  dimnames(critFin) <- list(c("Value"),c("Loglik", "AIC", "BIC"))
-  print(critFin)
+  print(object$critFin)
   cat('\nDetails:\n')
-  cat('Number of censored/missing values:', sum(object$ci), '\n')
-  cat('Convergence reached?:', (object$Iterations < object$MaxIter), '\n')
-  cat('Iterations:', object$Iterations,'/',object$MaxIter, '\n')
+  cat('Number of censored/missing values:', object$ncens, '\n')
+  cat('Convergence reached?:', (object$Iter < object$MaxIter), '\n')
+  cat('Iterations:', object$Iter,'/',object$MaxIter, '\n')
   cat('Processing time:', round(object$time,4), units(object$time), '\n')
 }
 
@@ -121,38 +98,15 @@ print.sclm = function(x, ...){
   cat("Call:\n")
   print(x$call)
   cat('\nEstimated parameters:\n')
-  # Estimates
-  if (all(x$X[,1]==1)) {
-    namesx = paste0('\u03b2',0)
-    if (ncol(x$X) > 1){ for (i in 2:ncol(x$X)){ namesx = cbind(namesx, paste0('\u03b2',i-1)) } }
-  } else {
-    namesx = paste0('\u03b2',1)
-    if (ncol(x$X) > 1){ for (i in 2:ncol(x$X)){ namesx = cbind(namesx, paste0('\u03b2',i)) } }
-  }
-  greeks = c(sigma='\u03c3\u00B2', phi='\u03D5', tau='\u03C4\u00B2')
-  lab = c(namesx,greeks)
-
-  if (x$show.SE) {
-    tab = round(rbind(c(x$theta),c(x$SE)),4)
-    colnames(tab) = lab
-    rownames(tab) = c("","s.e.")
-  } else {
-    tab = round(rbind(c(x$theta)),4)
-    colnames(tab) = lab
-    rownames(tab) = c("")
-  }
-  print(tab)
+  print(x$tab)
   cat('\n')
-  cat(paste('The effective range is',round(x$range,4),'spatial units.\n'))
+  cat(paste('The effective range is',round(x$range,4),'units.\n'))
   cat('\nModel selection criteria:\n')
-  critFin <- c(x$loglik, x$AIC, x$BIC)
-  critFin <- round(t(as.matrix(critFin)),2)
-  dimnames(critFin) <- list(c("Value"),c("Loglik", "AIC", "BIC"))
-  print(critFin)
+  print(x$critFin)
   cat('\nDetails:\n')
-  cat('Number of censored/missing values:',sum(x$ci),'\n')
-  cat('Convergence reached?:',(x$Iterations < x$MaxIter),'\n')
-  cat('Iterations:',x$Iterations,'/',x$MaxIter,'\n')
+  cat('Number of censored/missing values:', x$ncens,'\n')
+  cat('Convergence reached?:',(x$Iter < x$MaxIter),'\n')
+  cat('Iterations:',x$Iter,'/',x$MaxIter,'\n')
   cat('Processing time:',round(x$time,4),units(x$time),'\n')
 }
 

@@ -8,10 +8,10 @@ dist2Dmatrix(coords)
 \item{coords}{2D spatial coordinates.}
 }
 \value{
-The function returns the \eqn{n}x\eqn{n} distance matrix.
+An \eqn{n \times n} distance matrix.
 }
 \description{
-This function computes the Euclidean distance matrix for a set of coordinates.
+It computes the Euclidean distance matrix for a set of coordinates.
 }
 \examples{
 n = 100

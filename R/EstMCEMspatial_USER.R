@@ -1,5 +1,5 @@
 
-MCEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, init.phi, init.nugget, type="exponential", kappa=NULL,
+MCEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, phi0, nugget0, type="exponential", kappa=NULL,
                      lower=c(0.01,0.01), upper=c(30,30), MaxIter=500, nMin=20, nMax=5000, error=1e-5, show.SE=TRUE){
   n = length(c(y))
   if (!is.numeric(y)) stop("y must be a numeric vector")
@@ -45,10 +45,10 @@ MCEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, init.phi, init.nugget
   }
 
   #Validating supports
-  if (length(c(init.phi))>1 | !is.numeric(init.phi)) stop("Initial value for phi must be provided")
-  if (init.phi <= 0) stop("init.phi must be non-negative")
-  if (length(c(init.nugget))>1 | !is.numeric(init.nugget)) stop("Initial value for nugget effect must be provided")
-  if (init.nugget <= 0) stop("init.nugget must be non-negative")
+  if (length(c(phi0))>1 | !is.numeric(phi0)) stop("Initial value for phi must be provided")
+  if (phi0 <= 0) stop("phi0 must be non-negative")
+  if (length(c(nugget0))>1 | !is.numeric(nugget0)) stop("Initial value for nugget effect must be provided")
+  if (nugget0 <= 0) stop("nugget0 must be non-negative")
   if (is.null(type)) stop("type must be specified")
   if (type!="matern" & type!="gaussian" & type!="pow.exp" & type!="exponential"){
     stop("type should be one of matern, gaussian, pow.exp or exponential")}
@@ -85,12 +85,34 @@ MCEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, init.phi, init.nugget
   #                                Outputs                              #
   #---------------------------------------------------------------------#
 
-  out.Sp = MCEM_Spatial(y, x, ci, lcl, ucl, coords, init.phi, init.nugget, type,
+  out.Sp = MCEM_Spatial(y, x, ci, lcl, ucl, coords, phi0, nugget0, type,
                         kappa, lower, upper, MaxIter, nMin, nMax, error, show.SE)
+  # Estimates
+  q = ncol(x)
+  lab = numeric(q + 3)
+  if (sum(abs(x[,1])) == nrow(x)){ for (i in 1:q) lab[i] = paste('beta',i-1,sep='')
+  } else { for (i in 1:q) lab[i] = paste('beta',i,sep='') }
+  lab[q+1] = 'sigma2';  lab[q+2] = 'phi';  lab[q+3] = 'tau2'
+
+  if (show.SE) {
+    tab = round(rbind(c(out.Sp$theta), c(out.Sp$SE)), 4)
+    colnames(tab) = lab
+    rownames(tab) = c("","s.e.")
+  } else {
+    tab = round(rbind(c(out.Sp$theta)), 4)
+    colnames(tab) = lab
+    rownames(tab) = c("")
+  }
+  # Information criteria
+  critFin = c(out.Sp$loglik, out.Sp$AIC, out.Sp$BIC)
+  critFin = round(t(as.matrix(critFin)), digits=3)
+  dimnames(critFin) = list(c("Value"), c("Loglik", "AIC", "BIC"))
+
   out.Sp$call = match.call()
-  out.Sp$range  = Effective.range(0.05, out.Sp$phi, kappa, type)
-  out.Sp$show.SE = show.SE
-  out.Sp$ci = ci
+  out.Sp$tab = tab
+  out.Sp$critFin = critFin
+  out.Sp$range = Effective.range(0.05, out.Sp$phi, kappa, type)
+  out.Sp$ncens = sum(ci)
   out.Sp$MaxIter = MaxIter
 
   class(out.Sp) <- "sclm"

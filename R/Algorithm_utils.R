@@ -22,11 +22,11 @@ MCEM_Spatial = function(y, x, cens, LI, LS, coords, init.phi, init.nugget, type.
     output = list(Theta=output$Theta, theta=output$theta, beta=output$beta, sigma2=output$sigma2,
                   phi=output$phi, tau2=output$tau2, EY=output$EY, EYY=output$EYY, SE=output$SE,
                   InfMat=output$InfMat, loglik=likeli$loglik, AIC=likeli$AIC, BIC=likeli$BIC,
-                  Iterations=output$Iterations, time=ptime, X=x, coord=coords, type=type.sc, kappa=kappa)
+                  Iter=output$Iterations, time=ptime, X=x, coord=coords, type=type.sc, kappa=kappa)
   } else {
     output = list(Theta=output$Theta, theta=output$theta, beta=output$beta, sigma2=output$sigma2,
                   phi=output$phi, tau2=output$tau2, EY=output$EY, EYY=output$EYY, loglik=likeli$loglik,
-                  AIC=likeli$AIC, BIC=likeli$BIC, Iterations=output$Iterations, time=ptime, X=x,
+                  AIC=likeli$AIC, BIC=likeli$BIC, Iter=output$Iterations, time=ptime, X=x,
                   coord=coords, type=type.sc, kappa=kappa)
   }
   return (output)
@@ -56,11 +56,11 @@ SAEM_Spatial = function(y, x, cens, LI, LS, coords, init.phi, init.nugget, type.
     output = list(Theta=output$Theta, theta=output$theta, beta=output$beta, sigma2=output$sigma2,
                   phi=output$phi, tau2=output$tau2, EY=output$EY, EYY=output$EYY, SE=output$SE,
                   InfMat=output$InfMat, loglik=likeli$loglik, AIC=likeli$AIC, BIC=likeli$BIC,
-                  Iterations=output$Iterations, time=ptime, X=x, coord=coords, type=type.sc, kappa=kappa)
+                  Iter=output$Iterations, time=ptime, X=x, coord=coords, type=type.sc, kappa=kappa)
   } else {
     output = list(Theta=output$Theta, theta=output$theta, beta=output$beta, sigma2=output$sigma2,
                   phi=output$phi, tau2=output$tau2, EY=output$EY, EYY=output$EYY, loglik=likeli$loglik,
-                  AIC=likeli$AIC, BIC=likeli$BIC, Iterations=output$Iterations, time=ptime, X=x,
+                  AIC=likeli$AIC, BIC=likeli$BIC, Iter=output$Iterations, time=ptime, X=x,
                   coord=coords, type=type.sc, kappa=kappa)
   }
   return (output)
@@ -89,11 +89,11 @@ EM_Spatial = function(y, x, cens, LI, LS, coords, init.phi, init.nugget, type.sc
     output = list(Theta=output$Theta, theta=output$theta, beta=output$beta, sigma2=output$sigma2,
                   phi=output$phi, tau2=output$tau2, EY=output$EY, EYY=output$EYY, SE=output$SE,
                   InfMat=output$InfMat, loglik=likeli$loglik, AIC=likeli$AIC, BIC=likeli$BIC,
-                  Iterations=output$Iterations, time=ptime, X=x, coord=coords, type=type.sc, kappa=kappa)
+                  Iter=output$Iterations, time=ptime, X=x, coord=coords, type=type.sc, kappa=kappa)
   } else {
     output = list(Theta=output$Theta, theta=output$theta, beta=output$beta, sigma2=output$sigma2,
                   phi=output$phi, tau2=output$tau2, EY=output$EY, EYY=output$EYY, loglik=likeli$loglik,
-                  AIC=likeli$AIC, BIC=likeli$BIC, Iterations=output$Iterations, time=ptime, X=x,
+                  AIC=likeli$AIC, BIC=likeli$BIC, Iter=output$Iterations, time=ptime, X=x,
                   coord=coords, type=type.sc, kappa=kappa)
   }
   return (output)
@@ -157,7 +157,7 @@ predict.new = function(model, x.new, coord.new){
   yPred = mediaP + Variance[pInd==1,pInd==0]%*%invObs%*%(model$EY - mediaO)
   varPred = Variance[pInd==1,pInd==1] - Variance[pInd==1,pInd==0]%*%invObs%*%Variance[pInd==0,pInd==1]
 
-  return (data.frame(xcoord=coord.new[,1], ycoord=coord.new[,2], predValues=yPred, sdPred=matrix(sqrt(diag(varPred)))))
+  return (list(coord=coord.new, predValues=yPred, sdPred=matrix(sqrt(diag(varPred)))))
 }
 
 # Generating spatial censored data
