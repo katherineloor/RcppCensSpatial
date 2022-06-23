@@ -1,15 +1,14 @@
-
 ## Re-submission
 
-This package was archived because of some problems with packages: CensSpatial, MomTrunc, and tlrmvnmvt. Then, we have:
-* Deleted CensSpatial package from suggests (DESCRIPTION).
-* Problems with tlrmvnmvt and MomTrunc were solved.
+This package was archived because of some problems with packages CensSpatial and MomTrunc. Then, we have:
 
-## Test environments
-* local R installation, R 4.2.0
-* ubuntu 16.04 (on travis-ci), R 4.2.0
-* win-builder (devel)
+* Deleted CensSpatial package from suggests (DESCRIPTION).
+
+* Problems with MomTrunc were solved.
+
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 note
+0 errors | 0 warnings | 1 note
+
+* This is a new release.

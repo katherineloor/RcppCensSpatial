@@ -42,6 +42,8 @@ Description: It provides functions to estimate parameters in spatial linear mode
   computing the covariance matrix and the distance matrix.
 License: GPL (>= 2)
 Encoding: UTF-8
+RoxygenNote: 7.2.0
+Roxygen: list(old_usage = TRUE)
 Imports: 
     ggplot2,
     gridExtra,

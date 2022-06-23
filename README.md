@@ -29,18 +29,18 @@ Valeriano et al. (2021).
 
 The `RcppCensSpatial` library provides the following functions:
 
--   `CovMat`: Computes the spatial covariance matrix.
--   `dist2Dmatrix`: Computes the Euclidean distance matrix for a set of
+-   `CovMat`: computes the spatial covariance matrix.
+-   `dist2Dmatrix`: computes the Euclidean distance matrix for a set of
     coordinates.
--   `EM.sclm`: Returns the ML estimates of the unknown parameters
-    computed via the EM algorithm.
--   `MCEM.sclm`: Returns the ML estimates of the unknown parameters
-    computed via the MCEM algorithm.
--   `SAEM.sclm`: Returns the ML estimates of the unknown parameters
-    computed via the SAEM algorithm.
--   `predict.sclm`: Performs spatial prediction in a set of new
+-   `EM.sclm`: fits a spatial censored linear regression model via the
+    EM algorithm.
+-   `MCEM.sclm`: fits a spatial censored linear regression model via the
+    MCEM algorithm.
+-   `SAEM.sclm`: fits a spatial censored linear regression model via the
+    SAEM algorithm.
+-   `predict.sclm`: performs spatial prediction in a set of new
     locations.
--   `rCensSp`: Simulates censored spatial data for an established
+-   `rCensSp`: simulates censored spatial data for an established
     censoring rate.
 
 `print`, `summary`, `predict`, and `plot` functions also work for the
@@ -97,7 +97,7 @@ data1 = dat$Data
 
 # EM estimation
 fit1 = EM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-               3, 1, MaxIter=300, error=1e-4)
+               phi0=3, nugget0=1, MaxIter=300, error=1e-4)
 fit1$tab
 #>       beta0  beta1   beta2 sigma2    phi   tau2
 #>      0.6959 1.7894 -0.9477 1.2032 4.3018 0.3824
@@ -105,7 +105,7 @@ fit1$tab
 
 # MCEM estimation
 fit2 = MCEM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-                 3, 1, MaxIter=300, nMax=1000, error=1e-4)
+                 phi0=3, nugget0=1, MaxIter=300, nMax=1000, error=1e-4)
 fit2$tab
 #>       beta0  beta1   beta2 sigma2    phi   tau2
 #>      0.6952 1.7896 -0.9476 1.2069 4.3216 0.3828
@@ -113,7 +113,7 @@ fit2$tab
 
 # SAEM estimation
 fit3 = SAEM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-                 3, 1, M=10, error=1e-4)
+                 phi0=3, nugget0=1, M=10, error=1e-4)
 fit3$tab
 #>       beta0  beta1   beta2 sigma2    phi   tau2
 #>      0.6959 1.7883 -0.9471 1.2060 4.3207 0.3811
@@ -155,7 +155,7 @@ print(fit3)
 #> Number of censored/missing values: 10 
 #> Convergence reached?: TRUE 
 #> Iterations: 161 / 300 
-#> Processing time: 1.3363 mins
+#> Processing time: 53.3971 secs
 ```
 
 On the other hand, the function `plot` provides convergence graphics for
@@ -192,24 +192,24 @@ mean((data2$y - pred3$predValues)^2)
 <div id="ref-delyon1999convergence" class="csl-entry">
 
 Delyon, B., M. Lavielle, and E. Moulines. 1999. “Convergence of a
-Stochastic Approximation Version of the EM Algorithm.” *Annals of
+Stochastic Approximation Version of the EM Algorithm.” *The Annals of
 Statistics* 27 (1): 94–128. <https://www.jstor.org/stable/120120>.
 
 </div>
 
 <div id="ref-dempster1977maximum" class="csl-entry">
 
-Dempster, A., N. Laird, and D. Rubin. 1977. “Maximum Likelihood from
-Incomplete Data via the EM Algorithm.” *Journal of the Royal Statistical
-Society: Series B (Methodological)* 39 (1): 1–22.
+Dempster, A. P., N. M. Laird, and D. B. Rubin. 1977. “Maximum Likelihood
+from Incomplete Data via the EM Algorithm.” *Journal of the Royal
+Statistical Society: Series B (Methodological)* 39 (1): 1–38.
 <https://www.jstor.org/stable/2984875>.
 
 </div>
 
 <div id="ref-louis1982finding" class="csl-entry">
 
-Louis, T. 1982. “Finding the Observed Information Matrix When Using the
-EM Algorithm.” *Journal of the Royal Statistical Society: Series B
+Louis, T. A. 1982. “Finding the Observed Information Matrix When Using
+the EM Algorithm.” *Journal of the Royal Statistical Society: Series B
 (Methodological)* 44 (2): 226–33.
 <https://www.jstor.org/stable/2345828>.
 
@@ -217,8 +217,8 @@ EM Algorithm.” *Journal of the Royal Statistical Society: Series B
 
 <div id="ref-ordonez2018geostatistical" class="csl-entry">
 
-Ordoñez, J., D. Bandyopadhyay, V. H. Lachos, and C. Cabral. 2018.
-“Geostatistical Estimation and Prediction for Censored Responses.”
+Ordoñez, J. A., D. Bandyopadhyay, V. H. Lachos, and C. R. B. Cabral.
+2018. “Geostatistical Estimation and Prediction for Censored Responses.”
 *Spatial Statistics* 23: 109–23.
 <https://doi.org/10.1016/j.spasta.2017.12.001>.
 
@@ -229,6 +229,7 @@ Ordoñez, J., D. Bandyopadhyay, V. H. Lachos, and C. Cabral. 2018.
 Valeriano, K. L., V. H. Lachos, M. O. Prates, and L. A. Matos. 2021.
 “Likelihood-Based Inference for Spatiotemporal Data with Censored and
 Missing Responses.” *Environmetrics* 32 (3).
+<https://doi.org/10.1002/env.2663>.
 
 </div>
 

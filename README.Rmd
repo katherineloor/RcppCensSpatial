@@ -26,13 +26,13 @@ This package also approximates the standard error of the estimates using the met
 
 The `RcppCensSpatial` library provides the following functions:
 
-* `CovMat`: Computes the spatial covariance matrix.
-* `dist2Dmatrix`: Computes the Euclidean distance matrix for a set of coordinates.
-* `EM.sclm`: Returns the ML estimates of the unknown parameters computed via the EM algorithm.
-* `MCEM.sclm`: Returns the ML estimates of the unknown parameters computed via the MCEM algorithm.
-* `SAEM.sclm`: Returns the ML estimates of the unknown parameters computed via the SAEM algorithm.
-* `predict.sclm`: Performs spatial prediction in a set of new locations.
-* `rCensSp`: Simulates censored spatial data for an established censoring rate.
+* `CovMat`: computes the spatial covariance matrix.
+* `dist2Dmatrix`: computes the Euclidean distance matrix for a set of coordinates.
+* `EM.sclm`: fits a spatial censored linear regression model via the EM algorithm.
+* `MCEM.sclm`: fits a spatial censored linear regression model via the MCEM algorithm.
+* `SAEM.sclm`: fits a spatial censored linear regression model via the SAEM algorithm.
+* `predict.sclm`: performs spatial prediction in a set of new locations.
+* `rCensSp`: simulates censored spatial data for an established censoring rate.
 
 `print`, `summary`, `predict`, and `plot` functions also work for the `sclm` class.
 
@@ -68,17 +68,17 @@ data1 = dat$Data
 
 # EM estimation
 fit1 = EM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-               3, 1, MaxIter=300, error=1e-4)
+               phi0=3, nugget0=1, MaxIter=300, error=1e-4)
 fit1$tab
 
 # MCEM estimation
 fit2 = MCEM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-                 3, 1, MaxIter=300, nMax=1000, error=1e-4)
+                 phi0=3, nugget0=1, MaxIter=300, nMax=1000, error=1e-4)
 fit2$tab
 
 # SAEM estimation
 fit3 = SAEM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-                 3, 1, M=10, error=1e-4)
+                 phi0=3, nugget0=1, M=10, error=1e-4)
 fit3$tab
 ```
 

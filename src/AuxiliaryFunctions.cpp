@@ -314,11 +314,66 @@ arma::mat Information(double sigma2, double phi, arma::mat X, arma::vec y, arma:
 // Information matrix for the EM - MCEM algorithm for censored data
 // ------------------------------------------------------------------------------------------------------------
 arma::mat rtnormal(int n, arma::vec mu, arma::mat Sigma, arma::vec a, arma::vec b, int burn, int lag){
-  Environment pkg = Environment::namespace_env("relliptical");
-  Function rtelliptical2 = pkg["rtelliptical"];
-  arma::mat sample = as<arma::mat>(rtelliptical2(n, mu, Sigma, a, b, "Normal", R_NilValue, R_NilValue, R_NilValue, R_NilValue, burn, lag));
+  int m = lag*n + burn;
+  int p = Sigma.n_cols;
+  arma::vec s = sqrt(Sigma.diag());
+  arma::mat R = Sigma%(1.0/(s * s.t()));
+  arma::mat Rinv = R.i();
+  arma::mat X(n, p, fill::zeros);
 
-  return sample;
+  Rcpp::NumericVector l1 = Rcpp::wrap((a - mu)/s);
+  Rcpp::NumericVector u1 = Rcpp::wrap((b - mu)/s);
+  arma::vec pa = Rcpp::pnorm(l1,0,1,1,0);
+  arma::vec pb = Rcpp::pnorm(u1,0,1,1,0);
+  arma::vec x0 = randu<arma::vec>(p);
+  Rcpp::NumericVector x1 = Rcpp::wrap(pa + (pb - pa)%x0);
+  arma::colvec x = Rcpp::qnorm(x1,0,1,1,0);
+  arma::vec lower = as<arma::vec>(l1);
+  arma::vec upper = as<arma::vec>(u1);
+
+  arma::uvec q1 = find_nonfinite(x);
+  x.elem(q1) = lower.elem(q1);
+  q1 = find_nonfinite(x);
+  x.elem(q1) = upper.elem(q1);
+
+  umat minusj(p-1, p, fill::zeros);
+  for(int j=0; j<p; j++){
+    int k=0;
+    for(int l=0; l<p; l++){
+      if(l!=j){
+        minusj(k,j) = l;
+        k++;
+      }
+    }
+  }
+  double delta, kap, mj, tj, lv, rv, xij;
+  arma::uvec pj; arma::rowvec a1; arma::vec xj;
+  int count = 1;
+  for(int i=0; i<m; i++){
+    delta = as_scalar(x.t()*Rinv*x);
+    kap = -2.0*log(arma::randu<double>()) + delta;
+    for(int j=0; j<p; j++){
+      pj = minusj.col(j);
+      xj = x(pj);
+      a1 = xj.t()*Rinv.rows(pj);
+      mj = -a1(j)/Rinv(j,j);
+      tj = sqrt(mj*mj + (kap-as_scalar(a1.cols(pj)*xj))/Rinv(j,j));
+      lv = std::max(lower(j),(mj-tj));
+      rv = std::min(upper(j),(mj+tj));
+      xij = lv + (rv - lv)*arma::randu<double>();
+      x(j) = xij;
+    }
+    if (i==(burn + count*lag - 1)){
+      X.row(count-1) = x.t();
+      count++;
+    }
+  }
+  X = X.t();
+  X = X.each_col()%s;
+  X = (X.each_col() + mu).t();
+  X.replace(arma::datum::inf,arma::datum::nan);
+  X.replace(-arma::datum::inf,arma::datum::nan);
+  return X;
 }
 
 arma::mat InformationEM(arma::vec beta, double sigma2, double phi, double tau2, arma::mat X, arma::mat y, String typeS,
