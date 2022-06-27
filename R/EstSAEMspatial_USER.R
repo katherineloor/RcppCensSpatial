@@ -90,18 +90,18 @@
 #' @seealso \code{\link{EM.sclm}}, \code{\link{MCEM.sclm}}, \code{\link{predict.sclm}}
 #'
 #' @examples
-#' # Example 1: 5% of right-censored observations
+#' \donttest{# Example 1: 8% of right-censored observations
 #' set.seed(1000)
 #' n = 50   # Test with another values for n
 #' coords = round(matrix(runif(2*n,0,15),n,2), 5)
 #' x = cbind(rnorm(n), rnorm(n))
-#' data = rCensSp(c(4,-2), 1, 3, 0.50, x, coords, "right", 0.05)
+#' data = rCensSp(c(4,-2), 1, 3, 0.50, x, coords, "right", 0.08)
 #'
 #' fit = SAEM.sclm(y=data$y, x=x, ci=data$ci, lcl=data$lcl, ucl=data$ucl,
-#'                 coords, phi0=2, nugget0=1, type="exponential", M=5,
+#'                 coords, phi0=2, nugget0=1, type="exponential", M=10,
 #'                 pc=0.18)
 #' fit
-#' \donttest{
+#'
 #' # Example 2: censored and missing observations
 #' set.seed(123)
 #' n = 200

@@ -155,7 +155,7 @@ print(fit3)
 #> Number of censored/missing values: 10 
 #> Convergence reached?: TRUE 
 #> Iterations: 161 / 300 
-#> Processing time: 1.3001 mins
+#> Processing time: 37.2335 secs
 ```
 
 On the other hand, the function `plot` provides convergence graphics for
@@ -193,7 +193,7 @@ mean((data2$y - pred3$predValues)^2)
 
 Delyon, B., M. Lavielle, and E. Moulines. 1999. “Convergence of a
 Stochastic Approximation Version of the EM Algorithm.” *The Annals of
-Statistics* 27 (1): 94–128. <https://www.jstor.org/stable/120120>.
+Statistics* 27 (1): 94–128.
 
 </div>
 
@@ -202,7 +202,6 @@ Statistics* 27 (1): 94–128. <https://www.jstor.org/stable/120120>.
 Dempster, A. P., N. M. Laird, and D. B. Rubin. 1977. “Maximum Likelihood
 from Incomplete Data via the EM Algorithm.” *Journal of the Royal
 Statistical Society: Series B (Methodological)* 39 (1): 1–38.
-<https://www.jstor.org/stable/2984875>.
 
 </div>
 
@@ -211,7 +210,6 @@ Statistical Society: Series B (Methodological)* 39 (1): 1–38.
 Louis, T. A. 1982. “Finding the Observed Information Matrix When Using
 the EM Algorithm.” *Journal of the Royal Statistical Society: Series B
 (Methodological)* 44 (2): 226–33.
-<https://www.jstor.org/stable/2345828>.
 
 </div>
 
