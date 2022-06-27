@@ -1,7 +1,7 @@
 #' Distance matrix computation
 #'
 #' It computes the Euclidean distance matrix for a set of coordinates.
-#' @param coords 2D spatial coordinates.
+#' @param coords 2D spatial coordinates of dimensions \eqn{n\times 2}.
 #' @return An \eqn{n\times n} distance matrix.
 #' @author Katherine L. Valeriano, Alejandro Ordoñez, Christian E. Galarza, and Larissa A. Matos.
 #' @examples
@@ -13,12 +13,10 @@
 
 dist2Dmatrix = function(coords){
 
-  if (!is.null(coords)){
-    coords = as.matrix(coords)
-    if (!all(c(is.finite(coords)))) stop ("coords must contain only finite values")
-    if (ncol(coords) != 2) stop("coords must contain 2 columns")
-    if (nrow(coords) <= 1) stop("coords must be a matrix")
-  } else { stop("coords must be specified") }
+  if (length(c(coords)) == 0) stop("coords must be specified")
+  coords = as.matrix(coords)
+  if (ncol(coords) != 2) stop("coords must contain 2 columns")
+  if (!all(c(is.finite(coords)))) stop ("coords must contain only finite values")
 
   distancesM = crossdist(coords)
   out.ST = (distancesM + t(distancesM))/2
@@ -34,7 +32,7 @@ dist2Dmatrix = function(coords){
 #' @param phi spatial scaling parameter.
 #' @param tau2 nugget effect parameter.
 #' @param sig2 partial sill parameter.
-#' @param dist \eqn{n\times n} distance matrix.
+#' @param coords 2D spatial coordinates of dimensions \eqn{n\times 2}.
 #' @param type type of spatial correlation function: \code{'exponential'},
 #' \code{'gaussian'}, \code{'matern'}, and \code{'pow.exp'} for exponential,
 #' gaussian, matérn, and power exponential, respectively.
@@ -57,7 +55,7 @@ dist2Dmatrix = function(coords){
 #'
 #'     \item{\strong{Gaussian}:}{\eqn{Corr(d) = exp(-(d/\phi)^2)},}
 #'
-#'     \item{\strong{Matern}:}{\eqn{Corr(d) = \frac{1}{2^{(\kappa-1)}\Gamma(\kappa)}\left(\frac{d}{\phi}\right)^\kappa K_\kappa \left( \frac{d}{\phi} \right)},}
+#'     \item{\strong{Matérn}:}{\eqn{Corr(d) = \frac{1}{2^{(\kappa-1)}\Gamma(\kappa)}\left(\frac{d}{\phi}\right)^\kappa K_\kappa \left( \frac{d}{\phi} \right)},}
 #'
 #'     \item{\strong{Power exponential}:}{\eqn{Corr(d) = exp(-(d/\phi)^\kappa)},}
 #'
@@ -76,10 +74,9 @@ dist2Dmatrix = function(coords){
 #' set.seed(1000)
 #' n = 20
 #' coords = round(matrix(runif(2*n, 0, 10), n, 2), 5)
-#' Ms = dist2Dmatrix(coords)
-#' Cov = CovMat(phi=5, tau2=0.8, sig2=2, dist=Ms, type="exponential")
+#' Cov = CovMat(phi=5, tau2=0.8, sig2=2, coords=coords, type="exponential")
 
-CovMat = function(phi, tau2, sig2, dist, type="exponential", kappa=NULL){
+CovMat = function(phi, tau2, sig2, coords, type="exponential", kappa=NULL){
 
   if (length(c(phi))>1 | !is.numeric(phi)) stop("phi must be specified")
   if (phi <= 0) stop("The spatial parameter (phi) must be non-negative")
@@ -90,10 +87,10 @@ CovMat = function(phi, tau2, sig2, dist, type="exponential", kappa=NULL){
   if (length(c(sig2))>1 | !is.numeric(sig2)) stop("sig2 must be specified")
   if (sig2 <= 0) stop("The partial sill (sig2) must be non-negative")
 
-  dist = as.matrix(dist)
-  if (!all(c(is.finite(dist)))) stop ("dist must contain only finite values")
-  if (ncol(dist) != nrow(dist)) stop("Distance matrix must be specified")
-  if (!isSymmetric(dist)) stop("Distance matrix must be symmetric")
+  if (length(c(coords)) == 0) stop("coords must be specified")
+  coords = as.matrix(coords)
+  if (ncol(coords) != 2) stop("coords must contain 2 columns")
+  if (!all(c(is.finite(coords)))) stop ("coords must contain only finite values")
 
   if (is.null(type)) stop("type must be specified")
   if (type!="matern" & type !="gaussian" & type != "pow.exp" & type != "exponential"){
@@ -107,6 +104,7 @@ CovMat = function(phi, tau2, sig2, dist, type="exponential", kappa=NULL){
     if (type=="matern" & is.infinite(kappa)) stop("kappa must be a real number in (0,Inf)")
   } else { kappa = 0 }
 
+  dist = dist2Dmatrix(coords)
   Covariance = varianceMat(phi, tau2, sig2, kappa, dist, type)$Sigma
   out.ST = (Covariance + t(Covariance))/2
   return(out.ST)
@@ -127,7 +125,7 @@ CovMat = function(phi, tau2, sig2, dist, type="exponential", kappa=NULL){
 #' takes the conditional expectation E(Y|X) as the best linear predictor.
 #'
 #' @return The function returns a list with:
-#' \item{coord}{the matrix of coordinates.}
+#' \item{coord}{matrix of coordinates.}
 #' \item{predValues}{predicted values.}
 #' \item{sdPred}{predicted standard deviations.}
 #'
@@ -146,18 +144,16 @@ CovMat = function(phi, tau2, sig2, dist, type="exponential", kappa=NULL){
 #'
 #' # Estimation: EM algorithm
 #' fit1 = EM.sclm(y=data1$y, x=data1$x, ci=data1$ci, lcl=data1$lcl,
-#'                ucl=data1$ucl, coords=data1$coords, phi0=2.50, nugget0=1,
-#'                error=1e-4)
+#'                ucl=data1$ucl, coords=data1$coords, phi0=2.50, nugget0=1)
 #'
 #' # Estimation: SAEM algorithm
 #' fit2 = SAEM.sclm(y=data1$y, x=data1$x, ci=data1$ci, lcl=data1$lcl,
-#'                  ucl=data1$ucl, coords=data1$coords, phi0=2.50, nugget0=1,
-#'                  error=1e-4)
+#'                  ucl=data1$ucl, coords=data1$coords, phi0=2.50, nugget0=1)
 #'
 #' # Estimation: MCEM algorithm
 #' fit3 = MCEM.sclm(y=data1$y, x=data1$x, ci=data1$ci, lcl=data1$lcl,
 #'                  ucl=data1$ucl, coords=data1$coords, phi0=2.50, nugget0=1,
-#'                  MaxIter=300, error=1e-4)
+#'                  MaxIter=300)
 #' cbind(fit1$theta, fit2$theta, fit3$theta)
 #'
 #' # Prediction

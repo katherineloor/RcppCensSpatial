@@ -68,17 +68,17 @@ data1 = dat$Data
 
 # EM estimation
 fit1 = EM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-               phi0=3, nugget0=1, MaxIter=300, error=1e-4)
+               phi0=3, nugget0=1, MaxIter=300)
 fit1$tab
 
 # MCEM estimation
 fit2 = MCEM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-                 phi0=3, nugget0=1, MaxIter=300, nMax=1000, error=1e-4)
+                 phi0=3, nugget0=1, MaxIter=300, nMax=1000)
 fit2$tab
 
 # SAEM estimation
 fit3 = SAEM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-                 phi0=3, nugget0=1, M=10, error=1e-4)
+                 phi0=3, nugget0=1, M=10)
 fit3$tab
 ```
 

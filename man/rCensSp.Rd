@@ -16,7 +16,7 @@ rCensSp(beta, sigma2, phi, nugget, x, coords, cens = "left", pcens = 0.1,
 
 \item{nugget}{nugget effect parameter.}
 
-\item{x}{design matrix of dimensiones \eqn{n\times q}.}
+\item{x}{design matrix of dimensions \eqn{n\times q}.}
 
 \item{coords}{2D spatial coordinates of dimensions \eqn{n\times 2}.}
 
@@ -34,7 +34,7 @@ gaussian \code{kappa=NULL}, for power exponential \code{0 < kappa <= 2}, and for
 matérn correlation function \code{kappa > 0}.}
 }
 \value{
-If \code{npred > 0}, it returns a list with two datasets: \code{Data} and
+If \code{npred > 0}, it returns two lists: \code{Data} and
 \code{TestData}; otherwise, it returns a list with the simulated data.
 
 \code{Data}
@@ -61,7 +61,7 @@ x = cbind(1, rnorm(n))
 data = rCensSp(beta=c(5,2), sigma2=2, phi=4, nugget=0.70, x=x,
                coords=coords, cens="left", pcens=0.10, npred=10,
                cov.model="gaussian")
-data$TrainingData
+data$Data
 data$TestData
 }
 \author{

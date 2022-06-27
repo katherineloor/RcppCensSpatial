@@ -18,7 +18,7 @@
 }
 \value{
 The function returns a list with:
-\item{coord}{the matrix of coordinates.}
+\item{coord}{matrix of coordinates.}
 \item{predValues}{predicted values.}
 \item{sdPred}{predicted standard deviations.}
 }
@@ -41,18 +41,16 @@ data1 = data$Data
 
 # Estimation: EM algorithm
 fit1 = EM.sclm(y=data1$y, x=data1$x, ci=data1$ci, lcl=data1$lcl,
-               ucl=data1$ucl, coords=data1$coords, phi0=2.50, nugget0=1,
-               error=1e-4)
+               ucl=data1$ucl, coords=data1$coords, phi0=2.50, nugget0=1)
 
 # Estimation: SAEM algorithm
 fit2 = SAEM.sclm(y=data1$y, x=data1$x, ci=data1$ci, lcl=data1$lcl,
-                 ucl=data1$ucl, coords=data1$coords, phi0=2.50, nugget0=1,
-                 error=1e-4)
+                 ucl=data1$ucl, coords=data1$coords, phi0=2.50, nugget0=1)
 
 # Estimation: MCEM algorithm
 fit3 = MCEM.sclm(y=data1$y, x=data1$x, ci=data1$ci, lcl=data1$lcl,
                  ucl=data1$ucl, coords=data1$coords, phi0=2.50, nugget0=1,
-                 MaxIter=300, error=1e-4)
+                 MaxIter=300)
 cbind(fit1$theta, fit2$theta, fit3$theta)
 
 # Prediction

@@ -9,13 +9,13 @@
 #' of fixed effects, including the intercept.
 #' @param ci vector of censoring indicators of length \eqn{n}. For each observation:
 #' \code{1} if censored/missing, \code{0} otherwise.
-#' @param lcl,ucl vectors of length \eqn{n} that represent the lower and upper bounds
+#' @param lcl,ucl vectors of length \eqn{n} representing the lower and upper bounds
 #' of the interval, which contains the true value of the censored observation. Default
-#' \code{=NULL}, indicating no-censored data. For left censoring, \code{lcl=-Inf} and
-#' \code{ucl=c}. For right censoring, \code{lcl=c} and \code{ucl=Inf}. For interval
-#' censoring, \code{lcl} and \code{ucl} must be finite, while missing data could be
-#' defined by setting \code{lcl=-Inf} and \code{ucl=Inf}.
-#' @param coords 2D spatial coordinates.
+#' \code{=NULL}, indicating no-censored data. For each observation: \code{lcl=-Inf} and
+#' \code{ucl=c} (left censoring); \code{lcl=c} and \code{ucl=Inf} (right censoring); and
+#' \code{lcl} and \code{ucl} must be finite for interval censoring. Moreover, missing data
+#' could be defined by setting \code{lcl=-Inf} and \code{ucl=Inf}.
+#' @param coords 2D spatial coordinates of dimensions \eqn{n\times 2}.
 #' @param phi0 initial value for the spatial scaling parameter.
 #' @param nugget0 initial value for the nugget effect parameter.
 #' @param type type of spatial correlation function: \code{'exponential'},
@@ -27,8 +27,8 @@
 #' @param MaxIter maximum number of iterations for the MCEM algorithm. By default \code{=500}.
 #' @param nMin initial sample size for Monte Carlo integration. By default \code{=20}.
 #' @param nMax maximum sample size for Monte Carlo integration. By default \code{=5000}.
-#' @param error maximum convergence error. By default \code{=1e-5}.
-#' @param show.SE \code{TRUE} or \code{FALSE}. It indicates if the standard errors
+#' @param error maximum convergence error. By default \code{=1e-4}.
+#' @param show_se logical. It indicates if the standard errors
 #' should be estimated by default \code{=TRUE}.
 #'
 #' @details The spatial Gaussian model is given by
@@ -72,12 +72,12 @@
 #' \item{BIC}{Bayesian information criterion.}
 #' \item{Iter}{number of iterations needed to converge.}
 #' \item{time}{processing time.}
-#' \item{call}{The \code{ARCensReg} call that produced the object.}
-#' \item{tab}{Table of estimates.}
-#' \item{critFin}{Selection criteria.}
-#' \item{range}{the effective range.}
-#' \item{ncens}{Number of censored/missing observations.}
-#' \item{MaxIter}{The maximum number of iterations used for the EM algorithm.}
+#' \item{call}{\code{RcppCensSpatial} call that produced the object.}
+#' \item{tab}{table of estimates.}
+#' \item{critFin}{selection criteria.}
+#' \item{range}{effective range.}
+#' \item{ncens}{number of censored/missing observations.}
+#' \item{MaxIter}{maximum number of iterations for the MCEM algorithm.}
 #'
 #' @author Katherine L. Valeriano, Alejandro Ordoñez, Christian E. Galarza, and Larissa A. Matos.
 #'
@@ -93,10 +93,10 @@
 #'
 #' fit = MCEM.sclm(y=data$y, x=x, ci=data$ci, lcl=data$lcl, ucl=data$ucl,
 #'                 coords, phi0=2.50, nugget0=0.75, type="matern",
-#'                 kappa=1, MaxIter=30, nMax=1000, error=1e-4)
+#'                 kappa=1, MaxIter=30, nMax=1000)
 #' fit$tab
 #' \donttest{
-#' # Example 2: missing data
+#' # Example 2: left censoring and missing data
 #' yMiss = data$y
 #' yMiss[20] = NA
 #' ci = data$ci
@@ -106,13 +106,13 @@
 #'
 #' fit1 = MCEM.sclm(y=yMiss, x=x, ci=ci, lcl=data$lcl, ucl=ucl, coords,
 #'                  phi0=2.50, nugget0=0.75, type="matern", kappa=1,
-#'                  MaxIter=300, nMax=1000, error=1e-4)
+#'                  MaxIter=300, nMax=1000)
 #' summary(fit1)
 #' plot(fit1)}
 #' @references \insertAllCited
 
 MCEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, phi0, nugget0, type="exponential", kappa=NULL,
-                     lower=c(0.01,0.01), upper=c(30,30), MaxIter=500, nMin=20, nMax=5000, error=1e-5, show.SE=TRUE){
+                     lower=c(0.01,0.01), upper=c(30,30), MaxIter=500, nMin=20, nMax=5000, error=1e-4, show_se=TRUE){
   n = length(c(y))
   if (!is.numeric(y)) stop("y must be a numeric vector")
   if (!is.numeric(x)) stop("x must be a numeric matrix")
@@ -186,7 +186,7 @@ MCEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, phi0, nugget0, type="
   if (nMin > nMax) stop("nMax must be greater than or equal to nMin")
   if (length(c(error))>1 | !is.numeric(error)) stop("error must be specified")
   if (error <= 0) stop("error must be a positive value (suggested to be small)")
-  if (!is.logical(show.SE)) stop("show.SE must be logical (TRUE/FALSE).")
+  if (!is.logical(show_se)) stop("show_se must be logical (TRUE/FALSE).")
 
   ci = as.matrix(ci)
   lcl = as.matrix(lcl)
@@ -198,7 +198,7 @@ MCEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, phi0, nugget0, type="
   #---------------------------------------------------------------------#
 
   out.Sp = MCEM_Spatial(y, x, ci, lcl, ucl, coords, phi0, nugget0, type,
-                        kappa, lower, upper, MaxIter, nMin, nMax, error, show.SE)
+                        kappa, lower, upper, MaxIter, nMin, nMax, error, show_se)
   # Estimates
   q = ncol(x)
   lab = numeric(q + 3)
@@ -206,7 +206,7 @@ MCEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, phi0, nugget0, type="
   } else { for (i in 1:q) lab[i] = paste('beta',i,sep='') }
   lab[q+1] = 'sigma2';  lab[q+2] = 'phi';  lab[q+3] = 'tau2'
 
-  if (show.SE) {
+  if (show_se) {
     tab = round(rbind(c(out.Sp$theta), c(out.Sp$SE)), 4)
     colnames(tab) = lab
     rownames(tab) = c("","s.e.")

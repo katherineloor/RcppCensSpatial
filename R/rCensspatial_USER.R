@@ -6,7 +6,7 @@
 #' @param sigma2 partial sill parameter.
 #' @param phi spatial scaling parameter.
 #' @param nugget nugget effect parameter.
-#' @param x design matrix of dimensiones \eqn{n\times q}.
+#' @param x design matrix of dimensions \eqn{n\times q}.
 #' @param coords 2D spatial coordinates of dimensions \eqn{n\times 2}.
 #' @param cens \code{'left'} or \code{'right'} censoring. By default \code{='left'}.
 #' @param pcens desired censoring rate. By default \code{=0.10}.
@@ -17,7 +17,7 @@
 #' gaussian \code{kappa=NULL}, for power exponential \code{0 < kappa <= 2}, and for
 #' matérn correlation function \code{kappa > 0}.
 #'
-#' @return If \code{npred > 0}, it returns a list with two datasets: \code{Data} and
+#' @return If \code{npred > 0}, it returns two lists: \code{Data} and
 #' \code{TestData}; otherwise, it returns a list with the simulated data.
 #'
 #' \code{Data}
@@ -43,7 +43,7 @@
 #' data = rCensSp(beta=c(5,2), sigma2=2, phi=4, nugget=0.70, x=x,
 #'                coords=coords, cens="left", pcens=0.10, npred=10,
 #'                cov.model="gaussian")
-#' data$TrainingData
+#' data$Data
 #' data$TestData
 
 rCensSp = function(beta, sigma2, phi, nugget, x, coords, cens="left", pcens=0.10, npred=0,
@@ -70,8 +70,8 @@ rCensSp = function(beta, sigma2, phi, nugget, x, coords, cens="left", pcens=0.10
   if (is.null(cens)) stop("cens must be specified")
   if (cens!="left" & cens!="right") stop("cens should be one of left or right")
 
-  if (!is.numeric(pcens) | length(c(pcens))>1) stop ("pcens must be a real number in (0,1)")
-  if (pcens<=0 | pcens>=1) stop("pcens must be a real number in (0,1)")
+  if (!is.numeric(pcens) | length(c(pcens))>1) stop ("pcens must be a real number in [0,1]")
+  if (pcens<0 | pcens>1) stop("pcens must be a real number in [0,1]")
 
   if (!is.numeric(npred) | length(c(npred))>1) stop ("npred must be a positive integer")
   if (npred<0 | npred>=nrow(x) | npred%%1!=0) stop("npred must be a positive integer")

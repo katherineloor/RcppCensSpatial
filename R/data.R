@@ -3,8 +3,10 @@
 #' The level of dioxin (2,3,7,8-tetrachlorodibenzo-p-dioxin or TCDD) data was collected
 #' in November 1983 by the U.S. Environmental Protection Agency (EPA) in several areas
 #' of a highway in Missouri, USA. The TCDD measurement was subject to a limit of
-#' detection (\code{cens}); thereby, the \code{TCDD} data are left-censored. Only the
+#' detection (\code{cens}); thereby, the \code{TCDD} data is left-censored. Only the
 #' locations used in the geostatistical analysis by \insertCite{zirschky1986geostatistical;textual}{RcppCensSpatial} are shown.
+#'
+#' @usage data("Missouri")
 #'
 #' @format A data frame with 127 observations and five variables:
 #' \describe{

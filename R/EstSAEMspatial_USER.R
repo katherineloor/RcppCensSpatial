@@ -9,17 +9,17 @@
 #' of fixed effects, including the intercept.
 #' @param ci vector of censoring indicators of length \eqn{n}. For each observation:
 #' \code{1} if censored/missing, \code{0} otherwise.
-#' @param lcl,ucl vectors of length \eqn{n} that represent the lower and upper bounds
+#' @param lcl,ucl vectors of length \eqn{n} representing the lower and upper bounds
 #' of the interval, which contains the true value of the censored observation. Default
-#' \code{=NULL}, indicating no-censored data. For left censoring, \code{lcl=-Inf} and
-#' \code{ucl=c}. For right censoring, \code{lcl=c} and \code{ucl=Inf}. For interval
-#' censoring, \code{lcl} and \code{ucl} must be finite, while missing data could be
-#' defined by setting \code{lcl=-Inf} and \code{ucl=Inf}.
-#' @param coords 2D spatial coordinates.
+#' \code{=NULL}, indicating no-censored data. For each observation: \code{lcl=-Inf} and
+#' \code{ucl=c} (left censoring); \code{lcl=c} and \code{ucl=Inf} (right censoring); and
+#' \code{lcl} and \code{ucl} must be finite for interval censoring. Moreover, missing data
+#' could be defined by setting \code{lcl=-Inf} and \code{ucl=Inf}.
+#' @param coords 2D spatial coordinates of dimensions \eqn{n\times 2}.
 #' @param phi0 initial value for the spatial scaling parameter.
 #' @param nugget0 initial value for the nugget effect parameter.
-#' @param type type of spatial correlation function: '\code{exponential}',
-#' '\code{gaussian}', '\code{matern}', and '\code{pow.exp}' for exponential, gaussian,
+#' @param type type of spatial correlation function: \code{'exponential'},
+#' \code{'gaussian'}, \code{'matern'}, and \code{'pow.exp'} for exponential, gaussian,
 #' matérn, and power exponential, respectively.
 #' @param kappa parameter for some spatial correlation functions. See \code{\link{CovMat}}.
 #' @param lower,upper vectors of lower and upper bounds for the optimization method.
@@ -27,9 +27,9 @@
 #' @param MaxIter maximum number of iterations of the SAEM algorithm. By default \code{=300}.
 #' @param M number of Monte Carlo samples for stochastic approximation. By default \code{=20}.
 #' @param pc percentage of initial iterations of the SAEM algorithm with no memory.
-#' It is recommended that \code{50<MaxIter*pc<100}. By default \code{=0.25}.
-#' @param error maximum convergence error. By default \code{=1e-5}.
-#' @param show.SE \code{TRUE} or \code{FALSE}. It indicates if the standard errors
+#' It is recommended that \code{50<MaxIter*pc<100}. By default \code{=0.20}.
+#' @param error maximum convergence error. By default \code{=1e-4}.
+#' @param show_se logical. It indicates if the standard errors
 #' should be estimated by default \code{=TRUE}.
 #'
 #' @details The spatial Gaussian model is given by
@@ -46,13 +46,11 @@
 #' \insertCite{delyon1999convergence;textual}{RcppCensSpatial}. The spatial censored
 #' (SAEM) algorithm was previously proposed by \insertCite{lachos2017influence;textual}{RcppCensSpatial} and
 #' \insertCite{ordonez2018geostatistical;textual}{RcppCensSpatial} and is available in the package \code{CensSpatial}.
-#' The difference between our proposal and \code{CensSpatial} is that the random
-#' observations are sampled through the slice sampling algorithm available in package
-#' \code{relliptical} and the optimization procedure by the \code{roptim} package.
+#' These packages differ in the random number generation and optimization procedure.
 #'
-#' This model is also a particular case of the Spatio-temporal model defined by
-#' \insertCite{valeriano2021likelihood;textual}{RcppCensSpatial}, when the number of
-#' temporal observations is equal to one. The computing codes of the Spatio-temporal
+#' This model is also a particular case of the spatio-temporal model defined by
+#' \insertCite{valeriano2021likelihood;textual}{RcppCensSpatial} when the number of
+#' temporal observations is equal to one. The computing codes of the spatio-temporal
 #' SAEM algorithm are available in the package \code{StempCens}.
 #'
 #' @note The SAEM final estimates correspond to the estimates obtained at the last iteration
@@ -80,28 +78,28 @@
 #' \item{BIC}{Bayesian information criterion.}
 #' \item{Iter}{number of iterations needed to converge.}
 #' \item{time}{processing time.}
-#' \item{call}{The \code{ARCensReg} call that produced the object.}
-#' \item{tab}{Table of estimates.}
-#' \item{critFin}{Selection criteria.}
-#' \item{range}{the effective range.}
-#' \item{ncens}{Number of censored/missing observations.}
-#' \item{MaxIter}{The maximum number of iterations used for the EM algorithm.}
+#' \item{call}{\code{RcppCensSpatial} call that produced the object.}
+#' \item{tab}{table of estimates.}
+#' \item{critFin}{selection criteria.}
+#' \item{range}{effective range.}
+#' \item{ncens}{number of censored/missing observations.}
+#' \item{MaxIter}{maximum number of iterations for the SAEM algorithm.}
 #'
 #' @author Katherine L. Valeriano, Alejandro Ordoñez, Christian E. Galarza, and Larissa A. Matos.
 #'
 #' @seealso \code{\link{EM.sclm}}, \code{\link{MCEM.sclm}}, \code{\link{predict.sclm}}
 #'
 #' @examples
-#' # Example 1: 8% of right-censored observations
+#' # Example 1: 5% of right-censored observations
 #' set.seed(1000)
 #' n = 50   # Test with another values for n
 #' coords = round(matrix(runif(2*n,0,15),n,2), 5)
 #' x = cbind(rnorm(n), rnorm(n))
-#' data = rCensSp(c(4,-2), 1, 3, 0.50, x, coords, "right", 0.08)
+#' data = rCensSp(c(4,-2), 1, 3, 0.50, x, coords, "right", 0.05)
 #'
 #' fit = SAEM.sclm(y=data$y, x=x, ci=data$ci, lcl=data$lcl, ucl=data$ucl,
 #'                 coords, phi0=2, nugget0=1, type="exponential", M=5,
-#'                 pc=0.18, error=1e-4)
+#'                 pc=0.18)
 #' fit
 #' \donttest{
 #' # Example 2: censored and missing observations
@@ -117,13 +115,13 @@
 #'
 #' fit2 = SAEM.sclm(y=data$y, x=x, ci=data$ci, lcl=data$lcl, ucl=data$ucl,
 #'                  coords, phi0=2, nugget0=1, type="matern", kappa=3,
-#'                  M=10, pc=0.18, error=1e-4)
+#'                  M=10, pc=0.18)
 #' fit2$tab
 #' plot(fit2)}
 #' @references \insertAllCited
 
 SAEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, phi0, nugget0, type="exponential", kappa=NULL,
-                     lower=c(0.01,0.01), upper=c(30,30), MaxIter=300, M=20, pc=0.2, error=1e-5, show.SE=TRUE){
+                     lower=c(0.01,0.01), upper=c(30,30), MaxIter=300, M=20, pc=0.2, error=1e-4, show_se=TRUE){
   n = length(c(y))
   if (!is.numeric(y)) stop("y must be a numeric vector")
   if (!is.numeric(x)) stop("x must be a numeric matrix")
@@ -196,7 +194,7 @@ SAEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, phi0, nugget0, type="
   if (pc>1 | pc<0) stop("pc must be a real number in [0,1]")
   if (length(c(error))>1 | !is.numeric(error)) stop("error must be specified")
   if (error <= 0) stop("error must be a positive value (suggested to be small)")
-  if (!is.logical(show.SE)) stop("show.SE must be logical (TRUE/FALSE).")
+  if (!is.logical(show_se)) stop("show_se must be logical (TRUE/FALSE).")
 
   ci = as.matrix(ci)
   lcl = as.matrix(lcl)
@@ -208,7 +206,7 @@ SAEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, phi0, nugget0, type="
   #---------------------------------------------------------------------#
 
   out.Sp = SAEM_Spatial(y, x, ci, lcl, ucl, coords, phi0, nugget0, type,
-                        kappa, lower, upper, MaxIter, M, pc, error, show.SE)
+                        kappa, lower, upper, MaxIter, M, pc, error, show_se)
   # Estimates
   q = ncol(x)
   lab = numeric(q + 3)
@@ -216,7 +214,7 @@ SAEM.sclm = function(y, x, ci, lcl=NULL, ucl=NULL, coords, phi0, nugget0, type="
   } else { for (i in 1:q) lab[i] = paste('beta',i,sep='') }
   lab[q+1] = 'sigma2';  lab[q+2] = 'phi';  lab[q+3] = 'tau2'
 
-  if (show.SE) {
+  if (show_se) {
     tab = round(rbind(c(out.Sp$theta), c(out.Sp$SE)), 4)
     colnames(tab) = lab
     rownames(tab) = c("","s.e.")

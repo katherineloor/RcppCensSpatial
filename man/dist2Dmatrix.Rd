@@ -7,7 +7,7 @@
 dist2Dmatrix(coords)
 }
 \arguments{
-\item{coords}{2D spatial coordinates.}
+\item{coords}{2D spatial coordinates of dimensions \eqn{n\times 2}.}
 }
 \value{
 An \eqn{n\times n} distance matrix.

@@ -128,20 +128,20 @@ plot.convergence = function(model){
   Theta = model$Theta
   X = model$X
   q = length(model$beta)
-  Iter = nrow(Theta) - 1
+  Iter = model$Iter
 
   myplot = vector("list",q+3)
-  if (all(X[,1]==1)){ namesE <- c(seq(0,(q-1)),0,0,0) } else { namesE <- c(seq(1,q),0,0,0) }
-  Theta1 = rbind(namesE,Theta)
-  listabeta = as.list(data.frame(Theta1[,1:q]))
+  if (all(X[,1]==1)){ namesE = c(seq(0,(q-1)),0,0,0) } else { namesE = c(seq(1,q),0,0,0) }
+  listabeta = rbind(namesE,Theta)
+  listabeta = as.list(data.frame(listabeta[,1:q]))
   myplot[1:q] = lapply(listabeta, function(.x) ggplot(data.frame(.x[-1]),aes(x=seq(0,Iter),y=.x[-1])) +
                          geom_line() + labs(x="Iteration", y=bquote(beta[.(.x[1])])) + theme_bw())
-  rm(Theta1)
+
   myplot[[q+1]] = ggplot(data.frame(Theta),aes(x=seq(0,Iter),y=Theta[,q+1])) + geom_line() + labs(x="Iteration", y=bquote(sigma^2)) + theme_bw()
   myplot[[q+2]] = ggplot(data.frame(Theta),aes(x=seq(0,Iter),y=Theta[,q+2])) + geom_line() + labs(x="Iteration", y=bquote(phi)) + theme_bw()
   myplot[[q+3]] = ggplot(data.frame(Theta),aes(x=seq(0,Iter),y=Theta[,q+3])) + geom_line() + labs(x="Iteration", y=bquote(tau^2)) + theme_bw()
 
-  grid.arrange(grobs=myplot,ncol=3)
+  grid.arrange(grobs=myplot, ncol=3)
 }
 
 # Prediction in new locations

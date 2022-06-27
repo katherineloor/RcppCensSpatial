@@ -97,7 +97,7 @@ data1 = dat$Data
 
 # EM estimation
 fit1 = EM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-               phi0=3, nugget0=1, MaxIter=300, error=1e-4)
+               phi0=3, nugget0=1, MaxIter=300)
 fit1$tab
 #>       beta0  beta1   beta2 sigma2    phi   tau2
 #>      0.6959 1.7894 -0.9477 1.2032 4.3018 0.3824
@@ -105,7 +105,7 @@ fit1$tab
 
 # MCEM estimation
 fit2 = MCEM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-                 phi0=3, nugget0=1, MaxIter=300, nMax=1000, error=1e-4)
+                 phi0=3, nugget0=1, MaxIter=300, nMax=1000)
 fit2$tab
 #>       beta0  beta1   beta2 sigma2    phi   tau2
 #>      0.6952 1.7896 -0.9476 1.2069 4.3216 0.3828
@@ -113,7 +113,7 @@ fit2$tab
 
 # SAEM estimation
 fit3 = SAEM.sclm(data1$y, data1$x, data1$ci, data1$lcl, data1$ucl, data1$coords, 
-                 phi0=3, nugget0=1, M=10, error=1e-4)
+                 phi0=3, nugget0=1, M=10)
 fit3$tab
 #>       beta0  beta1   beta2 sigma2    phi   tau2
 #>      0.6959 1.7883 -0.9471 1.2060 4.3207 0.3811
@@ -138,7 +138,7 @@ print(fit3)
 #> Call:
 #> SAEM.sclm(y = data1$y, x = data1$x, ci = data1$ci, lcl = data1$lcl, 
 #>     ucl = data1$ucl, coords = data1$coords, phi0 = 3, nugget0 = 1, 
-#>     M = 10, error = 1e-04)
+#>     M = 10)
 #> 
 #> Estimated parameters:
 #>       beta0  beta1   beta2 sigma2    phi   tau2
@@ -155,7 +155,7 @@ print(fit3)
 #> Number of censored/missing values: 10 
 #> Convergence reached?: TRUE 
 #> Iterations: 161 / 300 
-#> Processing time: 53.3971 secs
+#> Processing time: 1.3001 mins
 ```
 
 On the other hand, the function `plot` provides convergence graphics for
@@ -229,7 +229,6 @@ Ordoñez, J. A., D. Bandyopadhyay, V. H. Lachos, and C. R. B. Cabral.
 Valeriano, K. L., V. H. Lachos, M. O. Prates, and L. A. Matos. 2021.
 “Likelihood-Based Inference for Spatiotemporal Data with Censored and
 Missing Responses.” *Environmetrics* 32 (3).
-<https://doi.org/10.1002/env.2663>.
 
 </div>
 

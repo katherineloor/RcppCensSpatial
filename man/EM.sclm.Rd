@@ -6,7 +6,7 @@
 \usage{
 EM.sclm(y, x, ci, lcl = NULL, ucl = NULL, coords, phi0, nugget0,
   type = "exponential", kappa = NULL, lower = c(0.01, 0.01),
-  upper = c(30, 30), MaxIter = 300, error = 1e-05, show.SE = TRUE)
+  upper = c(30, 30), MaxIter = 300, error = 1e-04, show_se = TRUE)
 }
 \arguments{
 \item{y}{vector of responses of length \eqn{n}.}
@@ -17,14 +17,14 @@ of fixed effects, including the intercept.}
 \item{ci}{vector of censoring indicators of length \eqn{n}. For each observation:
 \code{1} if censored/missing, \code{0} otherwise.}
 
-\item{lcl, ucl}{vectors of length \eqn{n} that represent the lower and upper bounds
+\item{lcl, ucl}{vectors of length \eqn{n} representing the lower and upper bounds
 of the interval, which contains the true value of the censored observation. Default
-code{=NULL}, indicating no-censored data. For left censoring, \code{lcl=-Inf} and
-\code{ucl=c}. For right censoring, \code{lcl=c} and \code{ucl=Inf}. For interval
-censoring, \code{lcl} and \code{ucl} must be finite, while missing data could be
-defined by setting \code{lcl=-Inf} and \code{ucl=Inf}.}
+\code{=NULL}, indicating no-censored data. For each observation: \code{lcl=-Inf} and
+\code{ucl=c} (left censoring); \code{lcl=c} and \code{ucl=Inf} (right censoring); and
+\code{lcl} and \code{ucl} must be finite for interval censoring. Moreover, missing data
+could be defined by setting \code{lcl=-Inf} and \code{ucl=Inf}.}
 
-\item{coords}{2D spatial coordinates.}
+\item{coords}{2D spatial coordinates of dimensions \eqn{n\times 2}.}
 
 \item{phi0}{initial value for the spatial scaling parameter.}
 
@@ -42,9 +42,9 @@ for upper.}
 
 \item{MaxIter}{maximum number of iterations for the EM algorithm. By default \code{=300}.}
 
-\item{error}{maximum convergence error. By default \code{=1e-5}.}
+\item{error}{maximum convergence error. By default \code{=1e-4}.}
 
-\item{show.SE}{logical. It indicates if the standard errors should be estimated by default \code{=TRUE}.}
+\item{show_se}{logical. It indicates if the standard errors should be estimated by default \code{=TRUE}.}
 }
 \value{
 An object of class "sclm". Generic functions \code{print} and \code{summary} have
@@ -67,12 +67,12 @@ Specifically, the following components are returned:
 \item{BIC}{Bayesian information criterion.}
 \item{Iter}{number of iterations needed to converge.}
 \item{time}{processing time.}
-\item{call}{The \code{ARCensReg} call that produced the object.}
-\item{tab}{Table of estimates.}
-\item{critFin}{Selection criteria.}
-\item{range}{the effective range.}
-\item{ncens}{Number of censored/missing observations.}
-\item{MaxIter}{The maximum number of iterations used for the EM algorithm.}
+\item{call}{\code{RcppCensSpatial} call that produced the object.}
+\item{tab}{table of estimates.}
+\item{critFin}{selection criteria.}
+\item{range}{effective range.}
+\item{ncens}{number of censored/missing observations.}
+\item{MaxIter}{maximum number of iterations for the EM algorithm.}
 }
 \description{
 It fits the left, right, or interval spatial censored linear model using the
@@ -110,7 +110,7 @@ x = cbind(rnorm(n), runif(n))
 data = rCensSp(c(-1,3), 2, 4, 0.5, x, coords, "left", 0.10, 0, "gaussian")
 
 fit = EM.sclm(y=data$y, x=x, ci=data$ci, lcl=data$lcl, ucl=data$ucl,
-              coords=coords, phi0=3, nugget0=1, type="gaussian", error=1e-4)
+              coords=coords, phi0=3, nugget0=1, type="gaussian")
 fit
 }
 \references{

@@ -4,7 +4,7 @@
 \alias{CovMat}
 \title{Covariance matrix for spatial models}
 \usage{
-CovMat(phi, tau2, sig2, dist, type = "exponential", kappa = NULL)
+CovMat(phi, tau2, sig2, coords, type = "exponential", kappa = NULL)
 }
 \arguments{
 \item{phi}{spatial scaling parameter.}
@@ -13,7 +13,7 @@ CovMat(phi, tau2, sig2, dist, type = "exponential", kappa = NULL)
 
 \item{sig2}{partial sill parameter.}
 
-\item{dist}{\eqn{n\times n} distance matrix.}
+\item{coords}{2D spatial coordinates of dimensions \eqn{n\times 2}.}
 
 \item{type}{type of spatial correlation function: \code{'exponential'},
 \code{'gaussian'}, \code{'matern'}, and \code{'pow.exp'} for exponential,
@@ -46,7 +46,7 @@ The spatial correlation functions available are:
 
     \item{\strong{Gaussian}:}{\eqn{Corr(d) = exp(-(d/\phi)^2)},}
 
-    \item{\strong{Matern}:}{\eqn{Corr(d) = \frac{1}{2^{(\kappa-1)}\Gamma(\kappa)}\left(\frac{d}{\phi}\right)^\kappa K_\kappa \left( \frac{d}{\phi} \right)},}
+    \item{\strong{Matérn}:}{\eqn{Corr(d) = \frac{1}{2^{(\kappa-1)}\Gamma(\kappa)}\left(\frac{d}{\phi}\right)^\kappa K_\kappa \left( \frac{d}{\phi} \right)},}
 
     \item{\strong{Power exponential}:}{\eqn{Corr(d) = exp(-(d/\phi)^\kappa)},}
 
@@ -59,8 +59,7 @@ and \eqn{K_\kappa(.)} is the modified Bessel function of the second kind of orde
 set.seed(1000)
 n = 20
 coords = round(matrix(runif(2*n, 0, 10), n, 2), 5)
-Ms = dist2Dmatrix(coords)
-Cov = CovMat(phi=5, tau2=0.8, sig2=2, dist=Ms, type="exponential")
+Cov = CovMat(phi=5, tau2=0.8, sig2=2, coords=coords, type="exponential")
 }
 \seealso{
 \code{\link{dist2Dmatrix}}, \code{\link{EM.sclm}}, \code{\link{MCEM.sclm}}, \code{\link{SAEM.sclm}}

@@ -23,7 +23,7 @@ Authors@R:
            role = "ctb",
            email = "larissam@unicamp.br",
            comment = c(ORCID = "0000-0002-2635-0901")))
-Description: It provides functions to estimate parameters in spatial linear models with 
+Description: It provides functions to estimate parameters in linear spatial models with 
   censored/missing responses via the Expectation-Maximization (EM) algorithm 
   (see Dempster, Laird, and Rubin (1977)<https://www.jstor.org/stable/2984875>), 
   the Stochastic Approximation EM (SAEM) algorithm (see Delyon, Lavielle, and 
@@ -37,8 +37,8 @@ Description: It provides functions to estimate parameters in spatial linear mode
   simulations of the missing data. In contrast, the SAEM algorithm splits the E-step 
   into simulation and integration steps. 
   This package also approximates the standard error of the estimates using the 
-  method developed by Louis (1982)<https://www.jstor.org/stable/2345828>. Furthermore, 
-  it has a function that performs spatial prediction in new locations. It also allows 
+  method developed by Louis (1982)<https://www.jstor.org/stable/2345828>. Moreover, 
+  it has a function that performs spatial prediction in new locations. It allows 
   computing the covariance matrix and the distance matrix.
 License: GPL (>= 2)
 Encoding: UTF-8
